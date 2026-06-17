@@ -2,3 +2,6 @@
 
 # Yocto build artifacts (generated locally)
 /build
+
+# Internal planning docs
+/docs
