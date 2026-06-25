@@ -1,7 +1,7 @@
 require opencentauri-image-base.bb
 inherit extract-partition
 
-DESCRIPTION = "OpenCentauri eMMC Image"
+DESCRIPTION = "Cosmos-Nebula eMMC Image"
 LICENSE = "GPL-3.0-only"
 
 IMAGE_FSTYPES += "wic squashfs"

@@ -1,6 +1,6 @@
 require opencentauri-image-base.bb
 
-DESCRIPTION = "OpenCentauri eMMC Image"
+DESCRIPTION = "Cosmos-Nebula USB Image"
 LICENSE = "GPL-3.0-only"
 
 IMAGE_FEATURES += "package-management"

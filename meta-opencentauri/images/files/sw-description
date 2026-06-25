@@ -1,7 +1,7 @@
 software =
 {
     version = "@@DISTRO_VERSION@@";
-    description = "Firmware update for OpenCentauri";
+    description = "Firmware update for Cosmos-Nebula";
 
     hardware-compatibility: [ "1.0" ];
 
