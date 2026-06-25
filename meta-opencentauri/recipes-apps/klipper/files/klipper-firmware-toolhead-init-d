@@ -1,72 +1,35 @@
 #!/bin/sh
 ### BEGIN INIT INFO
 # Provides:          klipper-firmware-toolhead
-# Required-Start:    $local_fs $remote_fs $network
-# Required-Stop:     $local_fs $remote_fs $network
+# Required-Start:    $local_fs
+# Required-Stop:     $local_fs
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Start OpenCentauri firmware
+# Short-Description: Toolhead MCU power control
 ### END INIT INFO
 
-FIRMWARE="/lib/firmware/klipper-toolhead.bin"
-FIRMWARE_VERSION="/lib/firmware/klipper-toolhead.bin.ver"
-KATAPULT_DEPLOYER="/lib/firmware/katapult-deployer-toolhead.bin"
-INSTALLED_VERSION="/etc/toolhead.ver"
-SERIALPORT="/dev/serial/by-path/platform-4101400.usb-usb-0:1:1.0"
+# GPIO 140: toolhead MCU reset line (high = running, low = held in reset)
 GPIO="140"
+SERIALPORT="/dev/serial/by-path/platform-4101400.usb-usb-0:1:1.0"
 
-update(){
-    if flashtool -d $SERIALPORT -f $FIRMWARE; then
-        cp $FIRMWARE_VERSION $INSTALLED_VERSION
-        sleep 3
-        echo "Firmware flashed and version recorded."
-    else
-        echo "Firmware flash failed, version not updated."
-        return 1
-    fi
+gpio_set() {
+    echo $GPIO > /sys/class/gpio/export 2>/dev/null || true
+    echo out > /sys/class/gpio/gpio$GPIO/direction
+    echo "$1" > /sys/class/gpio/gpio$GPIO/value
+    echo $GPIO > /sys/class/gpio/unexport 2>/dev/null || true
 }
 
 case "$1" in
     start)
-        echo "Starting klipper-firmware-toolhead..."
-        echo $GPIO > /sys/class/gpio/export
-        echo out > /sys/class/gpio/gpio$GPIO/direction
-        echo 1 > /sys/class/gpio/gpio$GPIO/value
-        echo $GPIO > /sys/class/gpio/unexport
+        echo "Powering on toolhead MCU..."
+        gpio_set 1
         sleep 3
-
-        if [ -f "$INSTALLED_VERSION" ] && [ "$(cat $INSTALLED_VERSION)" == "$(cat $FIRMWARE_VERSION)" ]; then
-            echo "Firmware is already up to date."
-            exit 0
-        else
-            echo "Firmware version mismatch or not installed, flashing firmware..."
-            if update; then
-                exit 0
-            else
-                echo "Attempting bootloader upgrade..."
-                echo $GPIO > /sys/class/gpio/export
-                echo out > /sys/class/gpio/gpio$GPIO/direction
-                echo 0 > /sys/class/gpio/gpio$GPIO/value
-                sleep 2
-                echo 1 > /sys/class/gpio/gpio$GPIO/value
-                sleep 3
-                if mcu-flasher --firmware $KATAPULT_DEPLOYER --no-wait $SERIALPORT --firmware-version 6.4.9; then
-                    sleep 3
-                    echo "Bootloader deployer flashed successfully, clearing installed version."
-                    rm -f $INSTALLED_VERSION
-                    update
-                else
-                    echo "Cannot update bootloader."
-                fi
-            fi
-        fi
+        echo "Toolhead MCU ready."
+        # Firmware flashing is managed by DSCS9 via SSH + flashtool
         ;;
     stop)
-        echo "Stopping klipper-firmware-toolhead..."
-        echo $GPIO > /sys/class/gpio/export
-        echo out > /sys/class/gpio/gpio$GPIO/direction
-        echo 0 > /sys/class/gpio/gpio$GPIO/value
-        echo $GPIO > /sys/class/gpio/unexport
+        echo "Powering off toolhead MCU..."
+        gpio_set 0
         ;;
     restart|force-reload)
         $0 stop
@@ -74,13 +37,13 @@ case "$1" in
         $0 start
         ;;
     status)
-        echo $GPIO > /sys/class/gpio/export
-        gpio_value=$(cat /sys/class/gpio/gpio$GPIO/value)
-        echo $GPIO > /sys/class/gpio/unexport
-        if [ "$gpio_value" = "1" ]; then
-            echo "klipper-firmware-toolhead is running"
+        echo $GPIO > /sys/class/gpio/export 2>/dev/null || true
+        VAL=$(cat /sys/class/gpio/gpio$GPIO/value 2>/dev/null || echo unknown)
+        echo $GPIO > /sys/class/gpio/unexport 2>/dev/null || true
+        if [ "$VAL" = "1" ]; then
+            echo "toolhead MCU: powered on"
         else
-            echo "klipper-firmware-toolhead is not running"
+            echo "toolhead MCU: powered off or unknown"
         fi
         ;;
     *)

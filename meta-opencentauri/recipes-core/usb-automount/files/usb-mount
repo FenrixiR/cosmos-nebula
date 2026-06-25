@@ -12,28 +12,6 @@ copy_wpa_config() {
     fi
 }
 
-copy_gcode_files() {
-    SRC_DIR="$1"
-
-    mkdir -p /user-resource
-
-    COPIED=0
-    for file in "$SRC_DIR"/*.gcode; do
-        [ -f "$file" ] || continue
-        BASENAME=$(basename "$file")
-        [ -f "/user-resource/$BASENAME" ] && continue
-
-        if [ "$COPIED" -eq 0 ]; then
-            uiprompt "Please wait" "Files from the USB are being copied to internal storage, please wait..."
-            COPIED=1
-        fi
-
-        cp "$file" /user-resource/ || { uiclear; return 1; }
-    done
-
-    [ "$COPIED" -eq 1 ] && uiclear
-}
-
 install_firmware_update() {
     SRC_DIR="$1"
     SWU_FILE="$SRC_DIR/emergency.swu"
@@ -55,14 +33,14 @@ install_firmware_update() {
         fi
     fi
 
-    uiprompt "Installing firmware" "A firmware update is being installed, please wait..."
+    echo "Installing firmware update..." >&2
 
     if ! flash "$SRC_DIR/emergency.swu.installed"; then
         echo "flash failed" > "$FAILED_FILE"
         return 1
     fi
 
-    uiprompt "Firmware update complete" "Please reboot the printer to finalize the update."
+    echo "Firmware update complete. Please reboot." >&2
     touch "$SUCCESS_FILE"
 }
 
@@ -74,7 +52,6 @@ case "$1" in
 
         if mountpoint -q "$MOUNT_POINT"; then
             copy_wpa_config "$MOUNT_POINT"
-            copy_gcode_files "$MOUNT_POINT"
             install_firmware_update "$MOUNT_POINT"
         fi
         ;;

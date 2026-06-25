@@ -3,23 +3,15 @@ import os, configparser, sys
 
 VALIDATORS = {
     'ui': {
-        'screen_ui': ['grumpyscreen', 'guppyscreen', 'atomscreen', 'none'],
-        'web_ui': ['mainsail', 'fluidd'],
+        'screen_ui': ['guppyscreen', 'none'],
         'screen_brightness': [str(i) for i in range(101)],
     },
     'update': {
         'release': ['stable', 'nightly'],
     },
-    'klipper': {
-        'sync_camera_led_to_chamber_led': ['True', 'False'],
-        'camera_led_default_on': ['True', 'False'],
-        'bypass_calibration': ['True', 'False'],
-        'full_calibrate_hotend_temperature': [str(i) for i in range(200, 301)],
-        'full_calibrate_bed_temperature': [str(i) for i in range(40, 101)],
-    },
 }
 
-VARIABLE_CONFIG_PATH = '/etc/klipper/config/cosmos.conf'
+VARIABLE_CONFIG_PATH = '/etc/klipper/config/nebula.conf'
 DEFAULT_CONFIG_PATH = '/usr/share/config-manager/default.conf'
 
 def validate_config(config : dict):

@@ -20,7 +20,7 @@ do_install() {
     install -m 0755 ${WORKDIR}/brightness ${D}${bindir}/brightness
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${sysconfdir}/init.d/gui-switcher \
     ${bindir}/brightness \
 "
