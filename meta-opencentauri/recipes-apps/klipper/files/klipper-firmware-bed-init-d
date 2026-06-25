@@ -25,7 +25,7 @@ case "$1" in
         gpio_set 1
         sleep 1
         echo "Bed MCU ready."
-        # Firmware flashing is managed by DSCS9 via SSH + flashtool
+        # Firmware flashing is managed by klipper-host via SSH + flashtool
         ;;
     stop)
         echo "Powering off bed MCU..."

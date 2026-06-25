@@ -10,21 +10,21 @@
 # See CONFIGURATION.md in the repo root for full documentation.
 
 [wifi]
-# SSID and WPA2-PSK password for the DSCS9 access point.
+# SSID and WPA2-PSK password for the klipper-host access point.
 # After editing, reboot Cosmos for the new credentials to take effect.
 ssid     = "cosmos-nebula"
 password = "CHANGE_ME"
 
 [bridge]
-# TCP ports on which tcp-serial-bridge listens for Klipper connections from DSCS9.
-# These must match the serial: socket://cosmos-nebula:PORT lines in DSCS9 printer.cfg.
-# Changing these requires updating printer.cfg on DSCS9 as well.
+# TCP ports on which tcp-serial-bridge listens for Klipper connections from klipper-host.
+# These must match the serial: socket://cosmos-nebula:PORT lines in klipper-host printer.cfg.
+# Changing these requires updating printer.cfg on klipper-host as well.
 mainboard_port = 7001
 bed_port       = 7002
 toolhead_port  = 7003
 
 [ntp]
 # NTP server Cosmos synchronises time with.
-# DSCS9 runs chrony as a local NTP server for Cosmos (D-08).
-# This should be DSCS9's WiFi interface IP (the default gateway Cosmos sees).
+# klipper-host runs chrony as a local NTP server for Cosmos (D-08).
+# This should be klipper-host's WiFi interface IP (the default gateway Cosmos sees).
 server = "192.168.4.1"

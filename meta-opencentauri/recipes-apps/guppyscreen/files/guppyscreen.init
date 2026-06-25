@@ -20,7 +20,7 @@ case "$1" in
             echo 0 > /sys/class/graphics/fbcon/cursor_blink
         fi
 
-        # Discover DSCS9's IP as the default gateway and patch guppyconfig.json.
+        # Discover klipper-host's IP as the default gateway and patch guppyconfig.json.
         # The overlayfs upper layer on /data makes /etc writable, so this persists
         # across reboots without touching the squashfs. Phase 5 (nebula.toml) will
         # generate the full config at boot instead.

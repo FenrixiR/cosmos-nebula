@@ -25,7 +25,7 @@ case "$1" in
         gpio_set 1
         sleep 3
         echo "Toolhead MCU ready."
-        # Firmware flashing is managed by DSCS9 via SSH + flashtool
+        # Firmware flashing is managed by klipper-host via SSH + flashtool
         ;;
     stop)
         echo "Powering off toolhead MCU..."

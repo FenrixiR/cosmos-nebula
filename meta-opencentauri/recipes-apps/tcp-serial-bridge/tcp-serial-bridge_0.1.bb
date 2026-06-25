@@ -1,6 +1,6 @@
 inherit cargo update-rc.d
 
-SUMMARY = "TCP Serial Bridge — exposes Cosmos MCU serial devices over TCP for DSCS9 Klipper"
+SUMMARY = "TCP Serial Bridge — exposes Cosmos MCU serial devices over TCP for klipper-host Klipper"
 HOMEPAGE = "https://github.com/FenrixiR/cosmos-nebula"
 LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://../LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"

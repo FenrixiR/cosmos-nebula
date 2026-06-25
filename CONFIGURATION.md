@@ -13,7 +13,7 @@ dependent config files are regenerated automatically at boot.
 - **Path:** `/etc/nebula.toml`
 - **Lives on:** the writable overlayfs upper layer (`/data`), not the read-only squashfs
 - **Survives:** OTA firmware updates (the overlayfs layer is preserved across A/B swaps)
-- **Edit via:** SSH from DSCS9 — `ssh root@cosmos-nebula nano /etc/nebula.toml`
+- **Edit via:** SSH from klipper-host — `ssh root@cosmos-nebula nano /etc/nebula.toml`
 
 After editing, reboot Cosmos:
 
@@ -25,7 +25,7 @@ reboot
 
 ```toml
 [wifi]
-ssid     = "cosmos-nebula"   # SSID of the DSCS9 access point
+ssid     = "cosmos-nebula"   # SSID of the klipper-host access point
 password = "CHANGE_ME"       # WPA2-PSK passphrase
 
 [bridge]
@@ -34,7 +34,7 @@ bed_port       = 7002        # Bed MCU (ttyS4, STM32F401 or RP2040)
 toolhead_port  = 7003        # Toolhead MCU (USB serial)
 
 [ntp]
-server = "192.168.4.1"       # NTP server — DSCS9's WiFi interface IP
+server = "192.168.4.1"       # NTP server — klipper-host's WiFi interface IP
 ```
 
 ### What gets generated
@@ -43,7 +43,7 @@ nebula-init runs at SysVinit priority S02 (before networking) and generates:
 
 | File | From section | Notes |
 |---|---|---|
-| `/etc/wpa_supplicant.conf` | `[wifi]` | Used by wlan0 to connect to DSCS9 AP |
+| `/etc/wpa_supplicant.conf` | `[wifi]` | Used by wlan0 to connect to klipper-host AP |
 | `/etc/tcp-serial-bridge.conf` | `[bridge]` | Read by tcp-serial-bridge at S95 |
 | `/etc/chrony.conf` | `[ntp]` | chrony connects to NTP server post-network |
 
@@ -53,7 +53,7 @@ Do not edit the generated files directly — they are overwritten on every boot.
 
 ## WiFi setup
 
-Cosmos connects to DSCS9 as a WiFi client (DSCS9 runs hostapd as an AP).
+Cosmos connects to klipper-host as a WiFi client (klipper-host runs hostapd as an AP).
 
 **First boot / initial WiFi setup:**
 
@@ -79,7 +79,7 @@ drop mechanism is still available as a recovery path if Cosmos cannot connect.
 ## TCP Serial Bridge
 
 The `tcp-serial-bridge` daemon exposes each MCU serial port as a TCP socket so
-DSCS9's Klipper can connect remotely.
+klipper-host's Klipper can connect remotely.
 
 ### Default port assignments
 
@@ -89,7 +89,7 @@ DSCS9's Klipper can connect remotely.
 | Bed MCU (STM32F401 or RP2040) | `/dev/ttyS4` | 7002 |
 | Toolhead MCU (STM32F401, USB) | `/dev/serial/by-path/platform-4101400.usb-usb-0:1:1.0` | 7003 |
 
-### DSCS9 printer.cfg connection strings
+### klipper-host printer.cfg connection strings
 
 ```ini
 [mcu]
@@ -112,14 +112,14 @@ Only one bed MCU definition should be active at a time — comment out the one n
 ### Changing ports
 
 Edit `[bridge]` in `/etc/nebula.toml`, reboot Cosmos, and update the corresponding
-`serial:` lines in DSCS9's `printer.cfg`.
+`serial:` lines in klipper-host's `printer.cfg`.
 
 ---
 
 ## Bed MCU: RP2040 Klicky probe board
 
 The custom RP2040-Zero bed MCU replaces the original Elegoo STM32F401 bed MCU.
-Both are supported; the active choice is made in DSCS9's `printer.cfg` (above).
+Both are supported; the active choice is made in klipper-host's `printer.cfg` (above).
 
 ### RP2040 GPIO assignments
 
@@ -165,7 +165,7 @@ on Cosmos.
 3. The RP2040 appears as a USB mass storage device (`RPI-RP2`).
 4. Copy the UF2 to the mounted drive — the RP2040 reboots into Katapult automatically.
 
-After this, all subsequent Klipper firmware updates happen automatically from DSCS9
+After this, all subsequent Klipper firmware updates happen automatically from klipper-host
 over UART via the tcp-serial-bridge.
 
 ### Emergency RP2040 recovery
@@ -178,12 +178,12 @@ UF2 bootloader lives in mask ROM and cannot be overwritten — BOOTSEL always wo
 ## MCU firmware management
 
 Firmware for external MCUs (toolhead STM32F401, bed STM32F401 or RP2040) is compiled
-on DSCS9 and pushed to Cosmos via SSH. Cosmos only handles power-on/reset via GPIO.
+on klipper-host and pushed to Cosmos via SSH. Cosmos only handles power-on/reset via GPIO.
 
-### Toolhead MCU firmware update (from DSCS9)
+### Toolhead MCU firmware update (from klipper-host)
 
 ```sh
-# On DSCS9:
+# On klipper-host:
 cd ~/klipper
 make KCONFIG_CONFIG=config.toolhead
 scp out/klipper.bin root@cosmos-nebula:/lib/firmware/klipper-toolhead.bin
@@ -198,19 +198,19 @@ ssh root@cosmos-nebula "flashtool -d /dev/serial/by-path/platform-4101400.usb-us
     -f /lib/firmware/klipper-toolhead.bin"
 ```
 
-### DSP (mainboard MCU) firmware update (from DSCS9)
+### DSP (mainboard MCU) firmware update (from klipper-host)
 
 The DSP firmware is compiled as part of the Yocto image but can be updated without
 a full reflash by placing a new binary at `/lib/firmware/rproc-1700000.dsp-fw`
 (the overlayfs `/lib/firmware` mount makes this writable):
 
 ```sh
-# On DSCS9, after building Klipper for HiFi4:
+# On klipper-host, after building Klipper for HiFi4:
 scp out/klipper.elf root@cosmos-nebula:/lib/firmware/rproc-1700000.dsp-fw
 ssh root@cosmos-nebula "/etc/init.d/klipper-firmware-dsp restart"
 ```
 
-DSP firmware version must be kept in sync with the Klipper host version on DSCS9.
+DSP firmware version must be kept in sync with the Klipper host version on klipper-host.
 
 ---
 
@@ -236,9 +236,9 @@ your hardware-modified bed will not function under stock firmware — this is ex
 |---|---|---|
 | S02 | `nebula-init` | Generates wpa_supplicant.conf, tcp-serial-bridge.conf, chrony.conf |
 | S21 | `zram-emmc-swap` | RAM compression + swap |
-| ~S40 | networking | wlan0 connects to DSCS9 AP using generated wpa_supplicant.conf |
+| ~S40 | networking | wlan0 connects to klipper-host AP using generated wpa_supplicant.conf |
 | S94 | `klipper-firmware-dsp` | Loads HiFi4 DSP firmware via remoteproc |
 | S94 | `klipper-firmware-toolhead` | Powers on toolhead MCU (GPIO 140) |
 | S94 | `klipper-firmware-bed` | Powers on bed MCU (GPIO 201) |
 | S95 | `tcp-serial-bridge` | Bridges MCU serial ports to TCP sockets |
-| S96 | `gui-switcher` → `guppyscreen` | Discovers DSCS9 gateway, starts screen UI |
+| S96 | `gui-switcher` → `guppyscreen` | Discovers klipper-host gateway, starts screen UI |
