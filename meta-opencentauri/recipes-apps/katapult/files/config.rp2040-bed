@@ -1,0 +1,38 @@
+CONFIG_LOW_LEVEL_OPTIONS=y
+# CONFIG_MACH_LPC176X is not set
+# CONFIG_MACH_STM32 is not set
+CONFIG_MACH_RPXXXX=y
+CONFIG_BOARD_DIRECTORY="rp2040"
+CONFIG_MCU="rp2040"
+# System clock: PLL output (125MHz). Crystal (12MHz XOSC) is the PLL reference.
+CONFIG_CLOCK_FREQ=125000000
+CONFIG_FLASH_SIZE=0x200000
+CONFIG_FLASH_BOOT_ADDRESS=0x10000000
+CONFIG_RAM_START=0x20000000
+CONFIG_RAM_SIZE=0x42000
+CONFIG_STACK_SIZE=512
+# 16KiB bootloader offset — Klipper application starts at 0x10004000
+CONFIG_FLASH_APPLICATION_ADDRESS=0x10004000
+CONFIG_FLASH_START=0x10000000
+CONFIG_LAUNCH_APP_ADDRESS=0x10004000
+CONFIG_BLOCK_SIZE=256
+CONFIG_RPXXXX_SELECT=y
+CONFIG_MACH_RP2040=y
+# Communication: UART serial (not USB, not CAN)
+# UART0 on GP0 (TX) and GP1 (RX), matching JST-XHB-5P pin4/pin5 connection to Cosmos ttyS4
+# CONFIG_USBSERIAL is not set
+# CONFIG_CANSERIAL is not set
+CONFIG_UARTSERIAL=y
+CONFIG_SERIAL_BAUD=250000
+CONFIG_UART_BAUD=250000
+CONFIG_UART_TX_PIN="gpio0"
+CONFIG_UART_RX_PIN="gpio1"
+# No deployer binary needed: RP2040 initial provisioning uses native UF2/BOOTSEL boot mode
+# CONFIG_BUILD_DEPLOYER is not set
+# CONFIG_ENABLE_DOUBLE_RESET is not set
+# CONFIG_ENABLE_BUTTON is not set
+# CONFIG_ENABLE_LED is not set
+CONFIG_HAVE_CHIPID=y
+# NOTE: verify these Kconfig variable names against `make menuconfig` in the Katapult
+# source on the build machine before the first build — UART pin variable names in
+# particular may vary across Katapult versions (gpio0/gpio1 vs GP0/GP1 vs numeric).

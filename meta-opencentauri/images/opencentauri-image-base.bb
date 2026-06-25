@@ -29,6 +29,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
     toolhead-bootloader-upgrade \
     bed-bootloader-stock \
     bed-bootloader-upgrade \
+    bed-bootloader-rp2040 \
     htop \
     i2c-tools \
     nano \

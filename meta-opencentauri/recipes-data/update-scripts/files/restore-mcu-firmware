@@ -10,11 +10,21 @@ SERIALPORT_TOOLHEAD="/dev/serial/by-path/platform-4101400.usb-usb-0:1:1.0"
 VERSION_TOOLHEAD="/etc/toolhead.ver"
 STOCK_FW_TOOLHEAD="/lib/firmware/katapult-deployer-stock-toolhead.bin"
 
-# Flash stock bootloader
-service klipper stop
-flashtool -d $SERIALPORT_BED -b 250000 -r
-flashtool -d $SERIALPORT_BED -f $STOCK_FW_BED -b 115200
-rm -f $VERSION_BED
+# Bed MCU restore (STM32F401 original only).
+# RP2040-based bed MCU does not need restoration: its UF2 bootloader lives in
+# mask ROM and is always accessible by holding BOOTSEL during power-on.
+if [ -f "$STOCK_FW_BED" ]; then
+    echo "Restoring stock bootloader to bed MCU (STM32F401)..."
+    flashtool -d $SERIALPORT_BED -b 250000 -r
+    flashtool -d $SERIALPORT_BED -f $STOCK_FW_BED -b 115200
+    rm -f $VERSION_BED
+else
+    echo "STM32 bed stock firmware not found; skipping bed MCU restore."
+    echo "If using RP2040 bed MCU: reflash Katapult via BOOTSEL if needed."
+fi
+
+# Toolhead MCU restore (STM32F401, always present)
+echo "Restoring stock bootloader to toolhead MCU..."
 flashtool -d $SERIALPORT_TOOLHEAD -f $STOCK_FW_TOOLHEAD
 rm -f $VERSION_TOOLHEAD
 
