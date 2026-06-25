@@ -1,0 +1,30 @@
+# /etc/nebula.toml — Cosmos-Nebula central configuration
+#
+# This file is the single source of truth for all environment-specific settings.
+# Edit it and reboot. All generated config files derive from here.
+#
+# Location:  /etc/nebula.toml
+# Editable:  yes — lives on the writable overlayfs (/data), survives OTA updates
+# Generated: wpa_supplicant.conf, tcp-serial-bridge.conf, chrony.conf
+#
+# See CONFIGURATION.md in the repo root for full documentation.
+
+[wifi]
+# SSID and WPA2-PSK password for the DSCS9 access point.
+# After editing, reboot Cosmos for the new credentials to take effect.
+ssid     = "cosmos-nebula"
+password = "CHANGE_ME"
+
+[bridge]
+# TCP ports on which tcp-serial-bridge listens for Klipper connections from DSCS9.
+# These must match the serial: socket://cosmos-nebula:PORT lines in DSCS9 printer.cfg.
+# Changing these requires updating printer.cfg on DSCS9 as well.
+mainboard_port = 7001
+bed_port       = 7002
+toolhead_port  = 7003
+
+[ntp]
+# NTP server Cosmos synchronises time with.
+# DSCS9 runs chrony as a local NTP server for Cosmos (D-08).
+# This should be DSCS9's WiFi interface IP (the default gateway Cosmos sees).
+server = "192.168.4.1"

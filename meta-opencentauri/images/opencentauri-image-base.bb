@@ -14,6 +14,7 @@ inherit core-image
 IMAGE_FEATURES += "ssh-server-dropbear"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
+    nebula-config \
     usbutils \
     libgpiod \
     libgpiod-tools \
