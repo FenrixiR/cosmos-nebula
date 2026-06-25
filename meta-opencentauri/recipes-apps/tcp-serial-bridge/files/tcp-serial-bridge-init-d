@@ -1,0 +1,43 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          tcp-serial-bridge
+# Required-Start:    $local_fs klipper-firmware-dsp
+# Required-Stop:     $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Description:       Cosmos-Nebula TCP Serial Bridge
+### END INIT INFO
+
+DAEMON=/usr/bin/tcp-serial-bridge
+PIDFILE=/var/run/tcp-serial-bridge.pid
+
+case "$1" in
+    start)
+        echo "Starting tcp-serial-bridge..."
+        start-stop-daemon -S -b -m -p "$PIDFILE" -x "$DAEMON"
+        ;;
+    stop)
+        echo "Stopping tcp-serial-bridge..."
+        start-stop-daemon -K -p "$PIDFILE" -R 5
+        rm -f "$PIDFILE"
+        ;;
+    restart|force-reload)
+        $0 stop
+        sleep 1
+        $0 start
+        ;;
+    status)
+        if [ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
+            echo "tcp-serial-bridge is running (PID $(cat "$PIDFILE"))"
+        else
+            echo "tcp-serial-bridge is not running"
+            return 1
+        fi
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|status}"
+        exit 1
+        ;;
+esac
+
+exit $?
