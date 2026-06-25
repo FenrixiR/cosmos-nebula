@@ -5,6 +5,20 @@ source "$(dirname "$0")/../install.conf"
 
 apt-get install -y hostapd dnsmasq
 
+# Tell NetworkManager to leave the WiFi interface alone so hostapd can own it.
+# On Armbian this is essential — NM will otherwise fight hostapd for wlan0.
+NM_CONF="/etc/NetworkManager/conf.d/unmanaged-${WIFI_IFACE}.conf"
+if [[ ! -f "$NM_CONF" ]]; then
+    mkdir -p /etc/NetworkManager/conf.d
+    cat > "$NM_CONF" <<EOF
+[keyfile]
+unmanaged-devices=interface-name:$WIFI_IFACE
+EOF
+    echo "Wrote $NM_CONF (NetworkManager will no longer manage $WIFI_IFACE)"
+    # Reload NM if running; ignore if not present
+    systemctl reload NetworkManager 2>/dev/null || true
+fi
+
 # Static IP on WiFi interface
 IFACE_CONF="/etc/network/interfaces.d/${WIFI_IFACE}-ap"
 if ! grep -q "address $WIFI_AP_IP" "$IFACE_CONF" 2>/dev/null; then
