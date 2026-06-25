@@ -24,8 +24,6 @@ S = "${WORKDIR}/git"
 DEPENDS = "cmake-native"
 
 RDEPENDS:${PN} = " \
-    klipper \
-    moonraker \
     gui-switcher \
 "
 

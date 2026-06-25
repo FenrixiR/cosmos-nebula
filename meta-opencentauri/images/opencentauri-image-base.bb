@@ -20,18 +20,19 @@ CORE_IMAGE_EXTRA_INSTALL += "\
     kernel-modules \
     rtw88 \
     aic8800 \
-    kalico \
-    moonraker \
-    mainsail \
-    fluidd \
-    atomscreen \
+    kalico-firmware-dsp \
+    tcp-serial-bridge \
     guppyscreen \
-    grumpyscreen \
+    mcu-flasher \
+    flashtool \
+    toolhead-bootloader-stock \
+    toolhead-bootloader-upgrade \
+    bed-bootloader-stock \
+    bed-bootloader-upgrade \
     htop \
     i2c-tools \
     nano \
     devmem2 \
-    ustreamer \
     swupdate \
     u-boot-fw-utils \
     zram \
@@ -41,8 +42,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
     opencentauri-bootlogos \
     swu-flasher \
     update-scripts \
-    fbdoom \
-    v4l-utils \
     iproute2 \
     chrony \
 "

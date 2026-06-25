@@ -1,14 +1,28 @@
-require kalico_${PV}.inc
 inherit update-rc.d
 
-SUMMARY = "Kalico 3D Printer Firmware"
-DESCRIPTION = "Klipper, but Limitless"
+HOMEPAGE = "https://kalico.gg/"
+LICENSE = "GPL-3.0-only"
+LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
 
-SRC_URI += " file://config.mainboard \
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+
+SRC_URI = "git://github.com/OpenCentauri/kalico.git;protocol=https;branch=rpmsg-with-new-hx71x \
+    file://config.mainboard \
     file://klipper-firmware-dsp-init-d \
 "
+SRCREV = "afe7178d0859f3cbc80e591473f86ee64183122b"
 
-DEPENDS += " gcc-xtensa-hifi4-elf-native"
+PR = "r5"
+
+S = "${WORKDIR}/git"
+
+SUMMARY = "Kalico DSP firmware for HiFi4 mainboard MCU"
+DESCRIPTION = "Klipper MCU firmware compiled for the AllWinner R528-S3 HiFi4 DSP"
+
+DEPENDS = " \
+    python3-native \
+    gcc-xtensa-hifi4-elf-native \
+"
 
 RPROVIDES:${PN} += "klipper-firmware-dsp"
 
